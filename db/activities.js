@@ -26,17 +26,18 @@ async function getAllActivites() {
 async function createActivity({ name, description }) {
   try {
     const lwrName = name.toLowerCase();
+    console.log("LOWERCASED NAME", lwrName);
     const {
       rows: [activity],
     } = await client.query(
       `
-    INSERT INTO activites (name, description)
+    INSERT INTO activities(name, description)
     VALUES($1,$2)
-    ON CONFLICT (name, description) DO NOTHING
     RETURNING*;
     `,
       [lwrName, description]
     );
+    console.log("THIS IS MY ACTIVITY", activity);
     return activity; // return the new activity
   } catch (error) {
     throw error;
