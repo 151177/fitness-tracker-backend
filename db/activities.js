@@ -53,18 +53,15 @@ async function updateActivity({ id, name, description }) {
     WHERE id = ${id};
     RETURNING*
     `);
-    return activity; // return the new activity
+    return activity; // return the updated activity
   } catch (error) {
     throw error;
   }
 }
-// don't try to update the id
-// do update the name and description
-// return the updated activity
 
 module.exports = {
   getActivityById,
   getAllActivites,
-  // createActivity,
-  // updateActivity
+  createActivity,
+  updateActivity,
 };
