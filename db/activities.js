@@ -1,4 +1,4 @@
-const { client } = require("./client");
+const client = require("./client");
 
 async function getActivityById(id) {
   try {
@@ -26,19 +26,17 @@ async function getAllActivites() {
 async function createActivity({ name, description }) {
   try {
     const lwrName = name.toLowerCase();
-    console.log("LOWERCASED NAME", lwrName);
     const {
       rows: [activity],
     } = await client.query(
       `
-    INSERT INTO activities(name, description)
+    INSERT INTO activities(name,description)
     VALUES($1,$2)
-    RETURNING*;
+    RETURNING *;
     `,
       [lwrName, description]
     );
-    console.log("THIS IS MY ACTIVITY", activity);
-    return activity; // return the new activity
+    return activity;
   } catch (error) {
     throw error;
   }

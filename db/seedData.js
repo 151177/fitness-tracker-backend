@@ -25,6 +25,7 @@ async function createTables() {
     name VARCHAR(255) UNIQUE NOT NULL,
     description TEXT NOT NULL
   );
+
   `);
     console.log("Finished building tables...");
   } catch (error) {
