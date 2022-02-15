@@ -5,18 +5,24 @@ const client = require("./client");
 async function dropTables() {
   console.log("Dropping All Tables...");
   // drop all tables, in the correct order
+  //DROP TABLE IF EXISTS activities;
 }
 
 async function createTables() {
   console.log("Starting to build tables...");
   // create all tables, in the correct order
-  await client.query(`
-  CREATE TABLE activites(
+  try {
+    await client.query(`
+    CREATE TABLE activites(
     id SERIAL PRIMARY KEY
     name VARCHAR(255) UNIQUE NOT NULL
     description TEXT NOT NULL
   );
   `);
+    console.log("Finished building tables...");
+  } catch (error) {
+    throw error;
+  }
 }
 
 /* 
