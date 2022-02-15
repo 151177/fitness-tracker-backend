@@ -15,6 +15,6 @@ app.use("/api", apiRouter);
 
 client.connect();
 
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`The server is up on  http://localhost:${PORT}`);
 });
