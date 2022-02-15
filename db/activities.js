@@ -59,8 +59,8 @@ async function updateActivity({ id, name, description }) {
 }
 
 module.exports = {
-  getActivityById,
-  getAllActivites,
-  createActivity,
-  updateActivity,
+  getActivityById: getActivityById,
+  getAllActivities: getAllActivites,
+  createActivity: createActivity,
+  updateActivity: updateActivity,
 };
