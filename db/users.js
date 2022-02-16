@@ -1,20 +1,19 @@
-const express = require("express");
-const usersRouter = express.Router();
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = process.env;
+const client = require("./client");
+const bcrypt = require("bcrypt");
 
 // createUser
 // createUser({ username, password })
 // make sure to hash the password before storing it to the database
 async function createUser({ id, username, password }) {
     try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const { rows } = await client.query(`
-        INSERT INTO users(id, username, password) 
-        VALUES($1, $2, $3) 
-        ON CONFLICT (username) DO NOTHING 
-        RETURNING *;
-      `, [id, username, password]);
+            INSERT INTO users(id, username, password) 
+            VALUES($1, $2, $3) 
+            ON CONFLICT (username) DO NOTHING 
+            RETURNING *;
+        `, [id, username, hashedPassword]);
 
         return rows;
     } catch (error) {
@@ -26,42 +25,21 @@ async function createUser({ id, username, password }) {
 // getUser({ username, password })
 // this should be able to verify the password against the hashed password
 async function getUser({ username, password }) {
-    // try {
-    //   const { rows } = await client.query(`
-    //   SELECT * FROM users
-    //   WHERE password = 
-    // `);
-    //   return rows;
-    // } catch (error) {
-    //   throw error;
-    // }
-
-    // if ( user === null) {
-    //     return res.status(400).send("Cannot find user")
-    // }
-    // try {
-    //     bcrypt.compare(req.body.password, user.password)
-    // } catch {
-    //     res.status(500).send()
-    // }
-
     try {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        const user = new User({
-            username: req.body.username,
-            password: hashedPassword,
-        });
+        const user = await getUserByUsername(username);
+        const hashedPassword = user.password;
+        const passwordsMatch = await bcrypt.compare(password, hashedPassword);
 
-        const { rows } = await client.query(`
-            SELECT * FROM users
-            WHERE password = hashedPassword;
-      `, [user]);
-
-        return user;
-    } catch {
+        if (passwordsMatch) {
+            delete user.password;
+            return user;
+        } else {
+            throw error;
+        }
+    } catch (error) {
         throw error;
     }
-}
+};
 
 // getUserById
 // getUserById(id)
