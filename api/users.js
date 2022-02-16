@@ -55,7 +55,7 @@ usersRouter.post('/users/register', async (req, res, next) => {
     );
 
     res.send({
-      message: 'Thank you for signing up',
+      message: "You've signed up! Now, let's checkout some Worq outs!",
       token,
     });
   } catch ({ name, message }) {
@@ -84,7 +84,7 @@ usersRouter.post('/users/login', async (req, res, next) => {
     if (user && user.password == password) {
       // create token & return to user
       const token = jwt.sign(user, JWT_SECRET);
-      res.send({ message: 'Welcome', token });
+      res.send({ message: 'Welcome back!', token });
     } else {
       next({
         name: 'IncorrectCredentialsError',
@@ -100,6 +100,20 @@ usersRouter.post('/users/login', async (req, res, next) => {
 
 // GET /users/me (*)
 // Send back the logged-in user's data if a valid token is supplied in the header.
+app.get('/users/me', (req, res, next) => {
+  const header = req.headers['authorization'];
+
+  if (typeof header !== 'undefined') {
+    const bearer = header.split(' ');
+    const token = bearer[1];
+
+    req.token = token;
+    next();
+  } else {
+    //If header is undefined return Forbidden (403)
+    res.sendStatus(403);
+  }
+});
 
 // GET /users/:username/routines
 // Get a list of public routines for a particular user.
