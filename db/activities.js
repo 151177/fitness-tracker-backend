@@ -47,7 +47,7 @@ async function updateActivity({ id, name, description }) {
     const {
       rows: [activity],
     } = await client.query(`
-    UPDATE activites
+    UPDATE activities
     SET name = ${name}, description = ${description}
     WHERE id = ${id}
     RETURNING*;
@@ -57,7 +57,6 @@ async function updateActivity({ id, name, description }) {
     throw error;
   }
 }
-
 module.exports = {
   getActivityById: getActivityById,
   getAllActivities: getAllActivites,
