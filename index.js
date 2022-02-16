@@ -14,7 +14,7 @@ app.use(cors());
 app.use("/api", apiRouter);
 
 app.get("*", (req, res, next) => {
-  res.status(400).send("This route does not exist");
+  res.status(404).send("This route does not exist");
 });
 
 app.use(({ name, message }, req, res, next) => {
