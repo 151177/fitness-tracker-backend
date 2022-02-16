@@ -23,8 +23,8 @@ activitiesRouter.get("/", async (req, res, next) => {
   }
 });
 
-//todo POST /activities (*)
-//! would not currently work until we have a user logged in
+// POST /activities (*)
+//! CURRENT ROUTE DOES NOT REQUIRE USER AUTHENTICATION
 // activitiesRouter.post("/", requireUser, async (req, res, next) => {
 activitiesRouter.post("/", async (req, res, next) => {
   try {
@@ -37,6 +37,34 @@ activitiesRouter.post("/", async (req, res, next) => {
 });
 
 //todo PATCH /activies/:activityId (*)
+activitiesRouter.patch("/:activityId", async (req, res, next) => {
+  try {
+    //grabs original activity info
+    const id = req.params.activityId;
+    const oldActivity = await getActivityById(id);
 
+    //setting updated info
+    const { name, description } = req.body;
+    const updateFields = {};
+    updateFields.id = id;
+
+    if (name) {
+      updateFields.name = name;
+    } else {
+      updateFields.name = oldActivity.name;
+    }
+
+    if (description) {
+      updateFields.description = description;
+    } else {
+      updateFields.description = oldActivity.description;
+    }
+
+    const newActivity = await updateActivity(updateFields);
+    res.send(newActivity);
+  } catch ({ name, message }) {
+    next({ name, message });
+  }
+});
 //todo GET /activities/:activityId/routines
 module.exports = activitiesRouter;
