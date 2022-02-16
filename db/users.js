@@ -36,8 +36,6 @@ async function getUser({ username, password }) {
     const hashedPassword = user.password;
     const passwordsMatch = await bcrypt.compare(password, hashedPassword);
 
-    console.log(`CHECKING IF MATCH FOR ${password}`, passwordsMatch);
-
     if (passwordsMatch) {
       delete user.password;
       return user;
@@ -100,8 +98,8 @@ async function getUserByUsername(username) {
 }
 
 module.exports = {
-  createUser: createUser,
-  getUser: getUser,
-  getUserById: getUserById,
-  getUserByUsername: getUserByUsername,
+  createUser,
+  getUser,
+  getUserById,
+  getUserByUsername,
 };
