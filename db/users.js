@@ -1,5 +1,5 @@
-const client = require('./client');
-const bcrypt = require('bcrypt');
+const client = require("./client");
+const bcrypt = require("bcrypt");
 
 // createUser
 // createUser({ username, password })
@@ -39,8 +39,6 @@ async function getUser({ username, password }) {
     if (passwordsMatch) {
       delete user.password;
       return user;
-    } else {
-      throw Error('Password does not match');
     }
   } catch (error) {
     throw error;

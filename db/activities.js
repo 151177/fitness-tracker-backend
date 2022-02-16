@@ -3,7 +3,7 @@ const client = require("./client");
 async function getActivityById(id) {
   try {
     const { rows } = await client.query(`
-    SELECT id FROM activites
+    SELECT id FROM activities
     WHERE id = ${id};
     `);
     return rows;
@@ -12,7 +12,7 @@ async function getActivityById(id) {
   }
 }
 
-async function getAllActivites() {
+async function getAllActivities() {
   try {
     const { rows } = await client.query(`
     SELECT * FROM activities;
@@ -45,21 +45,25 @@ async function createActivity({ name, description }) {
 async function updateActivity({ id, name, description }) {
   try {
     const {
-      rows: [activity],
-    } = await client.query(`
+      rows: [updatedActivity],
+    } = await client.query(
+      `
     UPDATE activities
-    SET name = ${name}, description = ${description}
+    SET name=$1, description=$2
     WHERE id = ${id}
     RETURNING*;
-    `);
-    return activity; // return the updated activity
+    `,
+      [name, description]
+    );
+    return updatedActivity; // return the updated activity
   } catch (error) {
     throw error;
   }
 }
+
 module.exports = {
-  getActivityById: getActivityById,
-  getAllActivities: getAllActivites,
-  createActivity: createActivity,
-  updateActivity: updateActivity,
+  getActivityById,
+  getAllActivities,
+  createActivity,
+  updateActivity,
 };
