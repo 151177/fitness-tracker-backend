@@ -37,6 +37,7 @@ activitiesRouter.post("/", async (req, res, next) => {
 });
 
 //todo PATCH /activies/:activityId (*)
+//! CURRENT ROUTE DOES NOT REQUIRE USER AUTHENTICATION
 activitiesRouter.patch("/:activityId", async (req, res, next) => {
   try {
     //grabs original activity info
@@ -45,26 +46,27 @@ activitiesRouter.patch("/:activityId", async (req, res, next) => {
 
     //setting updated info
     const { name, description } = req.body;
-    const updateFields = {};
-    updateFields.id = id;
+    const updates = {
+      id: id,
+      name: oldActivity.name,
+      description: oldActivity.description,
+    };
 
     if (name) {
-      updateFields.name = name;
-    } else {
-      updateFields.name = oldActivity.name;
+      updates.name = name;
     }
 
     if (description) {
-      updateFields.description = description;
-    } else {
-      updateFields.description = oldActivity.description;
+      updates.description = description;
     }
 
-    const newActivity = await updateActivity(updateFields);
+    const newActivity = await updateActivity(updates);
     res.send(newActivity);
   } catch ({ name, message }) {
     next({ name, message });
   }
 });
+
 //todo GET /activities/:activityId/routines
+
 module.exports = activitiesRouter;
