@@ -13,8 +13,15 @@ app.use(express.json());
 app.use(cors());
 app.use("/api", apiRouter);
 
-client.connect();
+app.get("*", (req, res, next) => {
+  res.status(400).send("This route does not exist");
+});
+
+app.use(({ name, message }, req, res, next) => {
+  res.status(500).send({ name: name, message: message });
+});
 
 app.listen(PORT, () => {
+  client.connect();
   console.log(`The server is up on  http://localhost:${PORT}`);
 });
