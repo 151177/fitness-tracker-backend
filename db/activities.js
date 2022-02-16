@@ -42,27 +42,20 @@ async function createActivity({ name, description }) {
   }
 }
 
-async function updateActivity(fields) {
-  const { id } = fields;
-  delete fields.id;
-  const setString = Object.keys(fields)
-    .map((key, index) => `${key}=$${index + 1}`)
-    .join(", ");
+async function updateActivity({ id, name, description }) {
   try {
     const {
-      rows: [activity],
+      rows: [updatedActivity],
     } = await client.query(
       `
     UPDATE activities
-    SET ${setString}
+    SET name=$1, description=$2
     WHERE id = ${id}
     RETURNING*;
     `,
-      Object.values(fields)
+      [name, description]
     );
-    delete activity.id;
-    console.log("This is updatedActivity", activity);
-    return activity; // return the updated activity
+    return updatedActivity; // return the updated activity
   } catch (error) {
     throw error;
   }
