@@ -8,7 +8,9 @@ async function createUser({ username, password }) {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const { rows } = await client.query(
+    const {
+      rows: [user],
+    } = await client.query(
       `
             INSERT INTO users(username, password) 
             VALUES($1, $2) 
@@ -18,7 +20,8 @@ async function createUser({ username, password }) {
       [username, hashedPassword]
     );
 
-    return rows;
+    delete user.password;
+    return user;
   } catch (error) {
     throw error;
   }
@@ -37,7 +40,7 @@ async function getUser({ username, password }) {
       delete user.password;
       return user;
     } else {
-      throw error;
+      throw Error('Password does not match');
     }
   } catch (error) {
     throw error;

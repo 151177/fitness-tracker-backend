@@ -1,5 +1,8 @@
 const express = require('express');
 const usersRouter = express.Router();
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+const { JWT_SECRET } = process.env;
 
 usersRouter.use((req, res, next) => {
   console.log('A request is being made to /users');
@@ -31,7 +34,7 @@ usersRouter.post('/users/register', async (req, res, next) => {
       });
     }
 
-    if (password < 8) {
+    if (password.length < 8) {
       next({
         name: 'PasswordLengthError',
         message: 'Please enter a password that is a minimum of 8 characters',
@@ -100,7 +103,7 @@ usersRouter.post('/users/login', async (req, res, next) => {
 
 // GET /users/me (*)
 // Send back the logged-in user's data if a valid token is supplied in the header.
-app.get('/users/me', (req, res, next) => {
+usersRouter.get('/users/me', (req, res, next) => {
   const header = req.headers['authorization'];
 
   if (typeof header !== 'undefined') {
