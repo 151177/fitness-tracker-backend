@@ -1,5 +1,5 @@
-const client = require('./client');
-const bcrypt = require('bcrypt');
+const client = require("./client");
+const bcrypt = require("bcrypt");
 
 // createUser
 // createUser({ username, password })
@@ -36,11 +36,11 @@ async function getUser({ username, password }) {
     const hashedPassword = user.password;
     const passwordsMatch = await bcrypt.compare(password, hashedPassword);
 
+    console.log(`CHECKING IF MATCH FOR ${password}`, passwordsMatch);
+
     if (passwordsMatch) {
       delete user.password;
       return user;
-    } else {
-      throw Error('Password does not match');
     }
   } catch (error) {
     throw error;
@@ -100,8 +100,8 @@ async function getUserByUsername(username) {
 }
 
 module.exports = {
-  createUser,
-  getUser,
-  getUserById,
-  getUserByUsername,
+  createUser: createUser,
+  getUser: getUser,
+  getUserById: getUserById,
+  getUserByUsername: getUserByUsername,
 };
