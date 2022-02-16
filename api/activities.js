@@ -25,11 +25,11 @@ activitiesRouter.get("/", async (req, res, next) => {
 
 //todo POST /activities (*)
 //! would not currently work until we have a user logged in
-activitiesRouter.post("/", requireUser, async (req, res, next) => {
-  const { name, description } = req.body;
-
+// activitiesRouter.post("/", requireUser, async (req, res, next) => {
+activitiesRouter.post("/", async (req, res, next) => {
   try {
-    const newActivity = createActivity(name, description);
+    const newActivity = await createActivity(req.body);
+    console.log(newActivity);
     res.send(newActivity);
   } catch ({ name, message }) {
     next({ name, message });
