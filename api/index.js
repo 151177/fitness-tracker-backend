@@ -9,6 +9,18 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
 
+apiRouter.get("/health", (req, res, next) => {
+  try {
+    res.send({
+      message: "Server is up and running",
+    });
+  } catch (error) {
+    next({
+      message: "Server is down :(",
+    });
+  }
+});
+
 const usersRouter = require("./users");
 apiRouter.use("/users", usersRouter);
 
