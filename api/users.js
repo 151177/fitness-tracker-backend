@@ -121,4 +121,4 @@ usersRouter.get("/users/me", (req, res, next) => {
 // GET /users/:username/routines
 // Get a list of public routines for a particular user.
 
-module.exports = userRouter;
+module.exports = usersRouter;
