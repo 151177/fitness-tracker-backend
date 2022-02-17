@@ -5,7 +5,7 @@ const express = require("express");
 const apiRouter = express.Router();
 const usersRouter = require("./users");
 const activitiesRouter = require("./activities");
-const {} = require("../db");
+const { getUserById } = require("../db");
 require("dotenv").config();
 
 const jwt = require("jsonwebtoken");
