@@ -26,7 +26,7 @@ activitiesRouter.get("/", async (req, res, next) => {
 // POST /activities (*)
 //! CURRENT ROUTE DOES NOT REQUIRE USER AUTHENTICATION
 // activitiesRouter.post("/", requireUser, async (req, res, next) => {
-activitiesRouter.post("/", async (req, res, next) => {
+activitiesRouter.post("/", requireUser, async (req, res, next) => {
   try {
     const newActivity = await createActivity(req.body);
     if (!newActivity) {
@@ -41,9 +41,9 @@ activitiesRouter.post("/", async (req, res, next) => {
   }
 });
 
-//todo PATCH /activies/:activityId (*)
+// PATCH /activies/:activityId (*)
 //! CURRENT ROUTE DOES NOT REQUIRE USER AUTHENTICATION
-activitiesRouter.patch("/:activityId", async (req, res, next) => {
+activitiesRouter.patch("/:activityId", requireUser, async (req, res, next) => {
   try {
     //grabs original activity info
     const id = req.params.activityId;
