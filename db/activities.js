@@ -34,6 +34,7 @@ async function createActivity({ name, description }) {
       `
     INSERT INTO activities(name,description)
     VALUES($1,$2)
+    ON CONFLICT (name) DO NOTHING 
     RETURNING *;
     `,
       [lwrName, description]
