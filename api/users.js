@@ -1,11 +1,11 @@
-const express = require('express');
+const express = require("express");
 const usersRouter = express.Router();
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 const { JWT_SECRET } = process.env;
 
 usersRouter.use((req, res, next) => {
-  console.log('A request is being made to /users');
+  console.log("A request is being made to /users");
 
   next();
 });
@@ -15,13 +15,13 @@ const {
   getUser,
   getUserById,
   getUserByUsername,
-} = require('../db');
+} = require("../db");
 
 // POST /users/register
 // Create a new user. Require username and password, and
 // hash password before saving user to DB.
 // Require all passwords to be at least 8 characters long.
-usersRouter.post('/users/register', async (req, res, next) => {
+usersRouter.post("/users/register", async (req, res, next) => {
   const { username, password } = req.body;
 
   try {
@@ -29,15 +29,15 @@ usersRouter.post('/users/register', async (req, res, next) => {
 
     if (user) {
       next({
-        name: 'UserExistsError',
-        message: 'A user by that username already exists',
+        name: "UserExistsError",
+        message: "A user by that username already exists",
       });
     }
 
     if (password.length < 8) {
       next({
-        name: 'PasswordLengthError',
-        message: 'Please enter a password that is a minimum of 8 characters',
+        name: "PasswordLengthError",
+        message: "Please enter a password that is a minimum of 8 characters",
       });
     }
 
@@ -53,7 +53,7 @@ usersRouter.post('/users/register', async (req, res, next) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: '1w',
+        expiresIn: "1w",
       }
     );
 
@@ -70,14 +70,14 @@ usersRouter.post('/users/register', async (req, res, next) => {
 // POST /users/login
 // Log in the user. Require username and password, and verify that plaintext login password
 // matches the saved hashed password before returning a JSON Web Token.
-usersRouter.post('/users/login', async (req, res, next) => {
+usersRouter.post("/users/login", async (req, res, next) => {
   const { username, password } = req.body;
 
   // request must have both
   if (!username || !password) {
     next({
-      name: 'MissingCredentialsError',
-      message: 'Please supply both a username and password',
+      name: "MissingCredentialsError",
+      message: "Please supply both a username and password",
     });
   }
 
@@ -87,11 +87,11 @@ usersRouter.post('/users/login', async (req, res, next) => {
     if (user && user.password == password) {
       // create token & return to user
       const token = jwt.sign(user, JWT_SECRET);
-      res.send({ message: 'Welcome back!', token });
+      res.send({ message: "Welcome back!", token });
     } else {
       next({
-        name: 'IncorrectCredentialsError',
-        message: 'Username or password is incorrect',
+        name: "IncorrectCredentialsError",
+        message: "Username or password is incorrect",
       });
     }
   } catch (error) {
@@ -103,11 +103,11 @@ usersRouter.post('/users/login', async (req, res, next) => {
 
 // GET /users/me (*)
 // Send back the logged-in user's data if a valid token is supplied in the header.
-usersRouter.get('/users/me', (req, res, next) => {
-  const header = req.headers['authorization'];
+usersRouter.get("/users/me", (req, res, next) => {
+  const header = req.headers["authorization"];
 
-  if (typeof header !== 'undefined') {
-    const bearer = header.split(' ');
+  if (typeof header !== "undefined") {
+    const bearer = header.split(" ");
     const token = bearer[1];
 
     req.token = token;
@@ -121,4 +121,4 @@ usersRouter.get('/users/me', (req, res, next) => {
 // GET /users/:username/routines
 // Get a list of public routines for a particular user.
 
-module.exports = userRouter;
+module.exports = usersRouter;
