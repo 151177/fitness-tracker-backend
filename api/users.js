@@ -21,7 +21,7 @@ const {
 // Create a new user. Require username and password, and
 // hash password before saving user to DB.
 // Require all passwords to be at least 8 characters long.
-usersRouter.post("/users/register", async (req, res, next) => {
+usersRouter.post("/register", async (req, res, next) => {
   const { username, password } = req.body;
 
   try {
@@ -46,20 +46,8 @@ usersRouter.post("/users/register", async (req, res, next) => {
       password,
     });
 
-    const token = jwt.sign(
-      {
-        id: newUser.id,
-        username,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1w",
-      }
-    );
-
     res.send({
-      message: "You've signed up! Now, let's checkout some Worq outs!",
-      token,
+      user: newUser,
     });
   } catch ({ name, message }) {
     next({ name, message });
@@ -70,7 +58,7 @@ usersRouter.post("/users/register", async (req, res, next) => {
 // POST /users/login
 // Log in the user. Require username and password, and verify that plaintext login password
 // matches the saved hashed password before returning a JSON Web Token.
-usersRouter.post("/users/login", async (req, res, next) => {
+usersRouter.post("/login", async (req, res, next) => {
   const { username, password } = req.body;
 
   // request must have both
@@ -82,12 +70,12 @@ usersRouter.post("/users/login", async (req, res, next) => {
   }
 
   try {
-    const user = await getUserByUsername(username);
-
-    if (user && user.password == password) {
+    const user = await getUser(req.body);
+    console.log(user);
+    if (user) {
       // create token & return to user
       const token = jwt.sign(user, JWT_SECRET);
-      res.send({ message: "Welcome back!", token });
+      res.send({ message: "Welcome back!", token: token });
     } else {
       next({
         name: "IncorrectCredentialsError",
@@ -103,7 +91,7 @@ usersRouter.post("/users/login", async (req, res, next) => {
 
 // GET /users/me (*)
 // Send back the logged-in user's data if a valid token is supplied in the header.
-usersRouter.get("/users/me", (req, res, next) => {
+usersRouter.get("/me", (req, res, next) => {
   const header = req.headers["authorization"];
 
   if (typeof header !== "undefined") {
