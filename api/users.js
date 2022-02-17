@@ -45,8 +45,6 @@ usersRouter.post("/register", async (req, res, next) => {
       password,
     });
 
-    console.log(newUser);
-
     res.send({
       user: newUser,
     });
@@ -72,11 +70,10 @@ usersRouter.post("/login", async (req, res, next) => {
 
   try {
     const user = await getUser(req.body);
-    console.log(user);
     if (user) {
       // create token & return to user
       const token = jwt.sign(user, JWT_SECRET);
-      res.send({ message: "Welcome back!", token: token });
+      res.send({ message: `Welcome back ${user.username}! `, token: token });
     } else {
       next({
         name: "IncorrectCredentialsError",
