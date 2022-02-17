@@ -27,7 +27,7 @@ async function getAllActivities() {
 
 async function createActivity({ name, description }) {
   try {
-    const lwrName = name.toLowerCase();
+    // const lwrName = name.toLowerCase();
     const {
       rows: [activity],
     } = await client.query(
@@ -37,7 +37,7 @@ async function createActivity({ name, description }) {
     ON CONFLICT (name) DO NOTHING 
     RETURNING *;
     `,
-      [lwrName, description]
+      [name, description]
     );
     return activity;
   } catch (error) {
