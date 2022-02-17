@@ -29,10 +29,15 @@ activitiesRouter.get("/", async (req, res, next) => {
 activitiesRouter.post("/", async (req, res, next) => {
   try {
     const newActivity = await createActivity(req.body);
-    console.log(newActivity);
+    if (!newActivity) {
+      console.log(newActivity);
+    }
     res.send(newActivity);
   } catch ({ name, message }) {
-    next({ name, message });
+    next({
+      name: "InvalidActivity",
+      message: "This activity already exists",
+    });
   }
 });
 
