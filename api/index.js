@@ -46,6 +46,7 @@ apiRouter.use(async (req, res, next) => {
   next();
 });
 
+// api routes
 apiRouter.get("/health", (req, res, next) => {
   try {
     res.send({
@@ -58,7 +59,6 @@ apiRouter.get("/health", (req, res, next) => {
   }
 });
 
-// api routes
 apiRouter.use("/users", usersRouter);
 apiRouter.use("/activities", activitiesRouter);
 
