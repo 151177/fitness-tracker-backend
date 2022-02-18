@@ -2,6 +2,30 @@ const client = require("./client");
 // getRoutineById
 // getRoutineById(id)
 // return the routine
+async function getRoutineById(routineId) {
+  try {
+    const {
+      rows: [routine],
+    } = await client.query(
+      `
+        SELECT * FROM routines
+        WHERE id = $1;
+      `,
+      [routineId]
+    );
+
+    if (!routine) {
+      throw {
+        name: "RoutineNotFoundError",
+        message: "Could not find a routine with that routineId",
+      };
+    }
+
+    return routine;
+  } catch (error) {
+    throw error;
+  }
+}
 
 // getRoutinesWithoutActivities
 // select and return an array of all routines
@@ -9,7 +33,7 @@ const client = require("./client");
 // getAllRoutines
 // select and return an array of all routines, include their activities
 
-// getAllPublicRoutines
+// getAllPublicRoutines "isPublic"
 // select and return an array of public routines, include their activities
 
 // getAllRoutinesByUser
@@ -67,5 +91,7 @@ async function updateRoutine({ id, isPublic, name, goal }) {
 // Make sure to delete all the routine_activities whose routine is the one being deleted.
 
 module.exports = {
+  getRoutineById,
+  getAllRoutines,
   createRoutine,
 };
