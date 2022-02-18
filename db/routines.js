@@ -1,5 +1,4 @@
 const client = require("./client");
-
 // getRoutineById
 // getRoutineById(id)
 // return the routine
@@ -33,56 +32,15 @@ async function getRoutineById(routineId) {
 
 // getAllRoutines
 // select and return an array of all routines, include their activities
-async function getAllRoutines() {
-  try {
-    const { rows } = await client.query(`
-      SELECT * FROM routines;
-    `);
-
-    return rows;
-  } catch (error) {
-    throw error;
-  }
-}
 
 // getAllPublicRoutines "isPublic"
 // select and return an array of public routines, include their activities
-async function getOpenReports() {
-  try {
-    // first load all of the reports which are open
-    const { rows: openReports } = await client.query(`
-        SELECT * FROM reports
-        WHERE "isOpen" = true;
-      `);
-
-    // then load the comments only for those reports, using a
-    // WHERE "reportId" IN () clause
-    const { rows: comments } = await client.query(`
-        SELECT * FROM comments
-        WHERE "reportId" IN (${openReports
-          .map((report) => report.id)
-          .join(",")});
-      `);
-
-    openReports.forEach((report) => {
-      delete report.password;
-      report.comments = comments.filter(({ reportId }) => {
-        return reportId === report.id;
-      });
-      report.isExpired = Date.parse(report.expirationDate) < new Date();
-    });
-
-    // finally, return the reports
-    return openReports;
-  } catch (error) {
-    throw error;
-  }
-}
 
 // getAllRoutinesByUser
 // getAllRoutinesByUser({ username })
 // select and return an array of all routines made by user, include their activities
 
+//TODO NUMS ROUTINE FUNCIONS BELOW
 // getPublicRoutinesByUser
 // getPublicRoutinesByUser({ username })
 // select and return an array of public routines made by user, include their activities
@@ -94,6 +52,22 @@ async function getOpenReports() {
 // createRoutine
 // createRoutine({ creatorId, isPublic, name, goal })
 // create and return the new routine
+async function createRoutine({ creatorId, isPublic, name, goal }) {
+  try {
+    const { rows: routine } = await client.query(
+      `
+  INSERT INTO routines("creatorId", "isPublic", name, goal)
+  VALUES($1,$2,$3,$4)
+  RETURNING*;
+  `,
+      [creatorId, isPublic, name, goal]
+    );
+    console.log("THIS IS MY ROUTINE", routine);
+    return routine;
+  } catch (error) {
+    throw error;
+  }
+}
 
 // updateRoutine
 // updateRoutine({ id, isPublic, name, goal })
@@ -109,4 +83,5 @@ async function getOpenReports() {
 module.exports = {
   getRoutineById,
   getAllRoutines,
+  createRoutine,
 };
