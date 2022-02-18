@@ -15,6 +15,7 @@
 // getAllRoutinesByUser({ username })
 // select and return an array of all routines made by user, include their activities
 
+//TODO NUMS ROUTINE FUNCIONS BELOW
 // getPublicRoutinesByUser
 // getPublicRoutinesByUser({ username })
 // select and return an array of public routines made by user, include their activities
