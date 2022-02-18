@@ -92,6 +92,6 @@ async function updateRoutine({ id, isPublic, name, goal }) {
 
 module.exports = {
   getRoutineById,
-  getAllRoutines,
+  // getAllRoutines,
   createRoutine,
 };
