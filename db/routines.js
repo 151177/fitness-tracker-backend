@@ -32,13 +32,20 @@ async function createRoutine({ creatorId, isPublic, name, goal }) {
   try {
     const { rows: routine } = await client.query(
       `
-  INSERT INTO routines("creatorId", "isPublic", name, goal)
-  VALUES($1,$2,$3,$4)
-  RETURNING*;
+     INSERT INTO routines("creatorId", "isPublic", name, goal)
+     VALUES($1,$2,$3,$4)
+     RETURNING*;
   `,
       [creatorId, isPublic, name, goal]
     );
-    console.log("THIS IS MY ROUTINE", routine);
+
+    if (!routine) {
+      throw new Error({
+        name: "FailedToCreateRoutine",
+        message: "Your Routine was not created",
+      });
+    }
+
     return routine;
   } catch (error) {
     throw error;
@@ -50,6 +57,9 @@ async function createRoutine({ creatorId, isPublic, name, goal }) {
 // Find the routine with id equal to the passed in id
 // Don't update the routine id, but do update the isPublic status, name, or goal, as necessary
 // Return the updated routine
+async function updateRoutine({ id, isPublic, name, goal }) {
+  //use getRoutineById()
+}
 
 // destroyRoutine
 // destroyRoutine(id)
