@@ -1,5 +1,6 @@
 const express = require("express");
 const usersRouter = express.Router();
+const { requireUser } = require("./utils.js");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const { JWT_SECRET } = process.env;
@@ -73,7 +74,11 @@ usersRouter.post("/login", async (req, res, next) => {
     if (user) {
       // create token & return to user
       const token = jwt.sign(user, JWT_SECRET);
-      res.send({ message: `Welcome back ${user.username}! `, token: token });
+      res.send({
+        user: user,
+        message: `Welcome back ${user.username}! `,
+        token: token,
+      });
     } else {
       next({
         name: "IncorrectCredentialsError",
@@ -89,19 +94,8 @@ usersRouter.post("/login", async (req, res, next) => {
 
 // GET /users/me (*)
 // Send back the logged-in user's data if a valid token is supplied in the header.
-usersRouter.get("/me", (req, res, next) => {
-  const header = req.headers["authorization"];
-
-  if (typeof header !== "undefined") {
-    const bearer = header.split(" ");
-    const token = bearer[1];
-
-    req.token = token;
-    next();
-  } else {
-    //If header is undefined return Forbidden (403)
-    res.sendStatus(403);
-  }
+usersRouter.get("/me", requireUser, (req, res, next) => {
+  res.send(req.user);
 });
 
 // GET /users/:username/routines
