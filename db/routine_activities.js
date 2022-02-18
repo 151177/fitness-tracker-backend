@@ -17,6 +17,7 @@ async function addActivityToRoutine({
       `
       INSERT INTO routineActivities("routineId","activityId",count,duration)
       VALUES($1,$2,$3,$4)
+      ON CONFLICT ("routineId", "activityId") DO NOTHING
       RETURNING *;
     `,
       [routineId, activityId, count, duration]
