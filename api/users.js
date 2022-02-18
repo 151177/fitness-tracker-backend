@@ -25,17 +25,16 @@ usersRouter.post("/register", async (req, res, next) => {
   const { username, password } = req.body;
 
   try {
-    const user = await getUserByUsername(username);
-
-    if (user) {
-      next({
+    const _user = await getUserByUsername(username);
+    if (_user) {
+      return next({
         name: "UserExistsError",
         message: "A user by that username already exists",
       });
     }
 
     if (password.length < 8) {
-      next({
+      return next({
         name: "PasswordLengthError",
         message: "Please enter a password that is a minimum of 8 characters",
       });
@@ -63,7 +62,7 @@ usersRouter.post("/login", async (req, res, next) => {
 
   // request must have both
   if (!username || !password) {
-    next({
+    return next({
       name: "MissingCredentialsError",
       message: "Please supply both a username and password",
     });
@@ -71,11 +70,10 @@ usersRouter.post("/login", async (req, res, next) => {
 
   try {
     const user = await getUser(req.body);
-    console.log(user);
     if (user) {
       // create token & return to user
       const token = jwt.sign(user, JWT_SECRET);
-      res.send({ message: "Welcome back!", token: token });
+      res.send({ message: `Welcome back ${user.username}! `, token: token });
     } else {
       next({
         name: "IncorrectCredentialsError",

@@ -9,7 +9,7 @@ const {
 const { requireUser } = require("./utils");
 
 activitiesRouter.use((req, res, next) => {
-  console.log("A request is being made /activities");
+  console.log("A request is being made to /activities");
   next();
 });
 
@@ -24,26 +24,24 @@ activitiesRouter.get("/", async (req, res, next) => {
 });
 
 // POST /activities (*)
-//! CURRENT ROUTE DOES NOT REQUIRE USER AUTHENTICATION
-// activitiesRouter.post("/", requireUser, async (req, res, next) => {
-activitiesRouter.post("/", async (req, res, next) => {
+//todo figure out a better way to prevent two of the same activity being made
+activitiesRouter.post("/", requireUser, async (req, res, next) => {
   try {
     const newActivity = await createActivity(req.body);
     if (!newActivity) {
-      console.log(newActivity);
+      return next({
+        name: "InvalidActivity",
+        message: "This activity already exists",
+      });
     }
     res.send(newActivity);
   } catch ({ name, message }) {
-    next({
-      name: "InvalidActivity",
-      message: "This activity already exists",
-    });
+    next({ name, message });
   }
 });
 
-//todo PATCH /activies/:activityId (*)
-//! CURRENT ROUTE DOES NOT REQUIRE USER AUTHENTICATION
-activitiesRouter.patch("/:activityId", async (req, res, next) => {
+// PATCH /activies/:activityId (*)
+activitiesRouter.patch("/:activityId", requireUser, async (req, res, next) => {
   try {
     //grabs original activity info
     const id = req.params.activityId;
