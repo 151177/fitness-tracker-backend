@@ -1,3 +1,4 @@
+const client = require("./client");
 // getRoutineById
 // getRoutineById(id)
 // return the routine
@@ -15,6 +16,7 @@
 // getAllRoutinesByUser({ username })
 // select and return an array of all routines made by user, include their activities
 
+//TODO NUMS ROUTINE FUNCIONS BELOW
 // getPublicRoutinesByUser
 // getPublicRoutinesByUser({ username })
 // select and return an array of public routines made by user, include their activities
@@ -26,6 +28,22 @@
 // createRoutine
 // createRoutine({ creatorId, isPublic, name, goal })
 // create and return the new routine
+async function createRoutine({ creatorId, isPublic, name, goal }) {
+  try {
+    const { rows: routine } = await client.query(
+      `
+  INSERT INTO routines("creatorId", "isPublic", name, goal)
+  VALUES($1,$2,$3,$4)
+  RETURNING*;
+  `,
+      [creatorId, isPublic, name, goal]
+    );
+    console.log("THIS IS MY ROUTINE", routine);
+    return routine;
+  } catch (error) {
+    throw error;
+  }
+}
 
 // updateRoutine
 // updateRoutine({ id, isPublic, name, goal })
@@ -37,3 +55,7 @@
 // destroyRoutine(id)
 // remove routine from database
 // Make sure to delete all the routine_activities whose routine is the one being deleted.
+
+module.exports = {
+  createRoutine,
+};
