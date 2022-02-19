@@ -1,5 +1,12 @@
 // require in the database adapter functions as you write them (createUser, createActivity...)
-const { createUser, createActivity, createRoutine } = require("./");
+const {
+  createUser,
+  createActivity,
+  createRoutine,
+  getRoutinesWithoutActivities,
+  getAllActivities,
+  addActivityToRoutine,
+} = require("./");
 const client = require("./client");
 
 async function dropTables() {
@@ -7,6 +14,7 @@ async function dropTables() {
     console.log("Dropping All Tables...");
     // drop all tables, in the correct order
     await client.query(`
+    DROP TABLE IF EXISTS routine_activities;
     DROP TABLE IF EXISTS routines;
     DROP TABLE IF EXISTS activities;
     DROP TABLE IF EXISTS users;
@@ -37,10 +45,19 @@ async function createTables() {
 
       CREATE TABLE routines(
         id SERIAL PRIMARY KEY,
-        "creatorId" INTEGER REFERENCES users(id),
+        "creatorId" INTEGER REFERENCES users(id) NOT NULL,
         "isPublic" BOOLEAN DEFAULT false,
         name VARCHAR(255) UNIQUE NOT NULL,
         goal TEXT	NOT NULL
+      );
+
+      CREATE TABLE routine_activities(
+        id SERIAL PRIMARY KEY,
+        "routineId" INTEGER REFERENCES routines(id) NOT NULL,
+        "activityId" INTEGER REFERENCES activities(id) NOT NULL,
+        UNIQUE("routineId","activityId"),
+        duration INTEGER,
+        count INTEGER
       );
       
     `);
@@ -235,7 +252,7 @@ async function rebuildDB() {
     await createInitialUsers();
     await createInitialActivities();
     await createInitialRoutines();
-    // await createInitialRoutineActivities();
+    await createInitialRoutineActivities();
   } catch (error) {
     console.log("Error during rebuildDB");
     throw error;
