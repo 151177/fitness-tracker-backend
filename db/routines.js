@@ -29,6 +29,16 @@ async function getRoutineById(routineId) {
 
 // getRoutinesWithoutActivities
 // select and return an array of all routines
+async function getRoutinesWithoutActivities() {
+  try {
+    const { rows: routines } = await client.query(`
+    SELECT * FROM routines 
+    `);
+    return routines;
+  } catch (error) {
+    throw error;
+  }
+}
 
 // getAllRoutines
 // select and return an array of all routines, include their activities
@@ -93,5 +103,6 @@ async function updateRoutine({ id, isPublic, name, goal }) {
 module.exports = {
   getRoutineById,
   // getAllRoutines,
+  getRoutinesWithoutActivities,
   createRoutine,
 };
