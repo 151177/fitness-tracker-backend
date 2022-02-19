@@ -1,72 +1,16 @@
-const client = require("./client");
+// getActivityById
+// getActivityById(id)
+// return the activity
 
-async function getActivityById(id) {
-  try {
-    const {
-      rows: [activity],
-    } = await client.query(`
-    SELECT * FROM activities
-    WHERE id = ${id};
-    `);
-    return activity;
-  } catch (error) {
-    throw error;
-  }
-}
+// getAllActivities
+// select and return an array of all activities
 
-async function getAllActivities() {
-  try {
-    const { rows } = await client.query(`
-    SELECT * FROM activities;
-    `);
-    return rows;
-  } catch (error) {
-    throw error;
-  }
-}
+// createActivity
+// createActivity({ name, description })
+// return the new activity
 
-async function createActivity({ name, description }) {
-  try {
-    // const lwrName = name.toLowerCase();
-    const {
-      rows: [activity],
-    } = await client.query(
-      `
-    INSERT INTO activities(name,description)
-    VALUES($1,$2)
-    ON CONFLICT (name) DO NOTHING 
-    RETURNING *;
-    `,
-      [name, description]
-    );
-    return activity;
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function updateActivity({ id, name, description }) {
-  try {
-    const {
-      rows: [updatedActivity],
-    } = await client.query(
-      `
-    UPDATE activities
-    SET name=$1, description=$2
-    WHERE id = ${id}
-    RETURNING*;
-    `,
-      [name, description]
-    );
-    return updatedActivity; // return the updated activity
-  } catch (error) {
-    throw error;
-  }
-}
-
-module.exports = {
-  getActivityById,
-  getAllActivities,
-  createActivity,
-  updateActivity,
-};
+// updateActivity
+// updateActivity({ id, name, description })
+// don't try to update the id
+// do update the name and description
+// return the updated activity

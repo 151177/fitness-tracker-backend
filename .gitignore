@@ -4,4 +4,3 @@ node_modules/
 .idea
 .env
 personal/
-local-tests.http 
