@@ -42,7 +42,7 @@ async function getRoutinesWithoutActivities() {
 
 // getAllRoutines
 // select and return an array of all routines, include their activities
-const getAllRoutines = async () => {
+async function getAllRoutines() {
   try {
     const { rows: routines } = await client.query(
       `
@@ -67,7 +67,7 @@ const getAllRoutines = async () => {
   } catch (error) {
     throw error;
   }
-};
+}
 
 // getAllPublicRoutines "isPublic"
 // select and return an array of public routines, include their activities
