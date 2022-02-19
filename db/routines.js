@@ -42,7 +42,7 @@ async function getRoutinesWithoutActivities() {
 
 // getAllRoutines
 // select and return an array of all routines, include their activities
-const getAllRoutines = async () => {
+async function getAllRoutines() {
   try {
     const { rows: routines } = await client.query(
       `
@@ -67,7 +67,7 @@ const getAllRoutines = async () => {
   } catch (error) {
     throw error;
   }
-};
+}
 
 // getAllPublicRoutines "isPublic"
 // select and return an array of public routines, include their activities
@@ -170,9 +170,31 @@ async function createRoutine({ creatorId, isPublic, name, goal }) {
 // Find the routine with id equal to the passed in id
 // Don't update the routine id, but do update the isPublic status, name, or goal, as necessary
 // Return the updated routine
-// async function updateRoutine({ id, isPublic, name, goal }) {
-//   //use getRoutineById()
-// }
+async function updateRoutine({ id, ...routineFields }) {
+  const setString = Object.keys(routineFields)
+    .map((key, index) => `"${key}" = $${index + 1}`)
+    .join(", ");
+
+  if (setString.length === 0) {
+    return;
+  }
+  try {
+    const {
+      rows: [routine],
+    } = await client.query(
+      `
+        UPDATE routines
+        SET ${setString}
+        WHERE id = ${id}
+        RETURNING *;
+      `,
+      Object.values(routineFields)
+    );
+    return routine;
+  } catch (error) {
+    throw error;
+  }
+}
 
 // destroyRoutine
 // destroyRoutine(id)
@@ -207,5 +229,6 @@ module.exports = {
   getAllPublicRoutines,
   getAllRoutinesByUser,
   createRoutine,
+  updateRoutine,
   destroyRoutine,
 };

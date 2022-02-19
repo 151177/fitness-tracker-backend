@@ -46,6 +46,24 @@ async function addActivityToRoutine({
 // getRoutineActivitiesByRoutine
 // getRoutineActivitiesByRoutine({ id })
 // select and return an array of all routine_activity records
+async function getRoutineActivitiesByRoutine({ id }) {
+  try {
+    const { rows: routineActivity } = await client.query(
+      `
+    SELECT *
+    FROM routine_activities
+    WHERE "routineId" = $1;
+  `,
+      [id]
+    );
+
+    return routineActivity;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   addActivityToRoutine,
+  getRoutineActivitiesByRoutine,
 };
