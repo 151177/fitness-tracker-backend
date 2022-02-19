@@ -59,7 +59,9 @@ const getAllRoutines = async () => {
     `);
 
     routines.forEach((routine) => {
-      return (routine = activities);
+      routine.activities = activities.filter(
+        (activity) => routine.id === activity.routineId
+      );
     });
     return routines;
   } catch (error) {
