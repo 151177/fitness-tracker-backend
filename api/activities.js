@@ -76,7 +76,7 @@ activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
   try {
     const id = req.params.activityId;
     const routines = await getPublicRoutinesByActivity({ id });
-    console.log("THESE ARE THE ROUTINES", routines);
+
     if (routines.length === 0) {
       return next({
         name: "NoRoutinesWithActivity",
