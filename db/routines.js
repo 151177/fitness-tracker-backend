@@ -129,7 +129,6 @@ async function getAllRoutinesByUser({ username }) {
   }
 }
 
-//TODO NUMS ROUTINE FUNCIONS BELOW
 // getPublicRoutinesByUser
 // getPublicRoutinesByUser({ username })
 // select and return an array of public routines made by user, include their activities
@@ -161,11 +160,36 @@ async function getPublicRoutinesByUser({ username }) {
   }
 }
 
+//todo incomplete
 // getPublicRoutinesByActivity
 // getPublicRoutinesByActivity({ id })
 // select and return an array of public routines which have a specific activityId in their routine_activities join, include their activities
 async function getPublicRoutinesByActivity({ id }) {
   try {
+    const { rows: routines } = await client.query(
+      `
+      SELECT routines.*, users.username AS "creatorName" FROM routines 
+      JOIN users ON users.id = "creatorId"
+      JOIN routine_activities ON routine_activities."routineId" = routines.id
+      WHERE "isPublic" = true AND "activityId" = $1;
+    `,
+      [id]
+    );
+
+    const { rows: activities } = await client.query(`
+    SELECT * FROM activities
+    JOIN routine_activities ON activities.id = routine_activities."activityId";
+  `);
+
+    routines.forEach((routine) => {
+      routine.activities = activities.filter(
+        (activity) => routine.id === activity.routineId
+      );
+    });
+
+    console.log("FROM getPublicRoutinesByActivity", routines);
+
+    return routines;
   } catch (error) {
     throw error;
   }
@@ -264,6 +288,7 @@ module.exports = {
   getAllPublicRoutines,
   getPublicRoutinesByUser,
   getAllRoutinesByUser,
+  getPublicRoutinesByActivity,
   createRoutine,
   updateRoutine,
   destroyRoutine,
