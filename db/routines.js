@@ -160,7 +160,6 @@ async function getPublicRoutinesByUser({ username }) {
   }
 }
 
-//todo incomplete
 // getPublicRoutinesByActivity
 // getPublicRoutinesByActivity({ id })
 // select and return an array of public routines which have a specific activityId in their routine_activities join, include their activities
