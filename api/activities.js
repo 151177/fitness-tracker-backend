@@ -71,7 +71,7 @@ activitiesRouter.patch("/:activityId", requireUser, async (req, res, next) => {
   }
 });
 
-//todo GET /activities/:activityId/routines
+//GET /activities/:activityId/routines
 activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
   try {
     const id = req.params.activityId;
