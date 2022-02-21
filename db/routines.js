@@ -164,6 +164,12 @@ async function getPublicRoutinesByUser({ username }) {
 // getPublicRoutinesByActivity
 // getPublicRoutinesByActivity({ id })
 // select and return an array of public routines which have a specific activityId in their routine_activities join, include their activities
+async function getPublicRoutinesByActivity({ id }) {
+  try {
+  } catch (error) {
+    throw error;
+  }
+}
 
 // createRoutine
 // createRoutine({ creatorId, isPublic, name, goal })
