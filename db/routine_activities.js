@@ -2,9 +2,24 @@ const client = require("./client");
 // getRoutineActivityById
 // getRoutineActivityById(id)
 // return the routine_activity
+async function getRoutineActivityById(id) {
+  try {
+    const {
+      rows: [routineActivity],
+    } = client.query(
+      `
+      SELECT * FROM routine_activities 
+      WHERE id = $1
+    `,
+      [id]
+    );
+    return routineActivity;
+  } catch (error) {
+    throw error;
+  }
+}
 
 // addActivityToRoutine
-// addActivityToRoutine({ routineId, activityId, count, duration })
 // create a new routine_activity, and return it
 async function addActivityToRoutine({
   routineId,
@@ -37,12 +52,31 @@ async function addActivityToRoutine({
 }
 
 // updateRoutineActivity
-// updateRoutineActivity({ id, count, duration })
 // Find the routine_activity with id equal to the passed in id
 // Update the count or duration as necessary
+async function updateRoutineActivity({ id, ...updateFields }) {
+  const setString = Object.keys(updateFields)
+    .map((key, index) => `"${key}" = $${index + 1}`)
+    .join(",");
+  try {
+    const {
+      rows: [routineActivity],
+    } = await client.query(
+      `
+    UPDATE routine_activities 
+    SET ${setString}
+    WHERE id = ${id}
+    RETURNING *;
+  `,
+      Object.values(updateFields)
+    );
+    return routineActivity;
+  } catch (error) {
+    throw error;
+  }
+}
 
 // destroyRoutineActivity
-// destroyRoutineActivity(id)
 // remove routine_activity from database
 async function destroyRoutineActivity(id) {
   try {
@@ -69,7 +103,6 @@ async function destroyRoutineActivity(id) {
 }
 
 // getRoutineActivitiesByRoutine
-// getRoutineActivitiesByRoutine({ id })
 // select and return an array of all routine_activity records
 async function getRoutineActivitiesByRoutine({ id }) {
   try {
@@ -89,7 +122,9 @@ async function getRoutineActivitiesByRoutine({ id }) {
 }
 
 module.exports = {
+  getRoutineActivityById,
   addActivityToRoutine,
+  updateRoutineActivity,
   destroyRoutineActivity,
   getRoutineActivitiesByRoutine,
 };
