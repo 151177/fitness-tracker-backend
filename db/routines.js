@@ -186,8 +186,6 @@ async function getPublicRoutinesByActivity({ id }) {
       );
     });
 
-    console.log("FROM getPublicRoutinesByActivity", routines);
-
     return routines;
   } catch (error) {
     throw error;
