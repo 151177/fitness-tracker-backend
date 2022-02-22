@@ -35,6 +35,12 @@ routineRouter.get("/", async (req, res, next) => {
 //POST /routines (*)
 routineRouter.post("/", requireUser, async (req, res, next) => {
   try {
+    if (!req.body.name || !req.body.goal) {
+      return next({
+        name: "MissingNameOrGoal",
+        message: "Please include both a name and a goal for your routine",
+      });
+    }
     const routineFields = {
       creatorId: req.user.id,
       isPublic: req.body.isPublic,
@@ -43,10 +49,29 @@ routineRouter.post("/", requireUser, async (req, res, next) => {
     };
     const newRoutine = await createRoutine(routineFields);
     res.send(newRoutine);
+  } catch ({ name, message }) {
+    next({ name, message });
+  }
+});
+
+//PATCH /routines/:routineId (**)
+routineRouter.patch("/:routineId", requireUser, async (req, res, next) => {
+  try {
+    const id = req.params.routineId;
+    const ogRoutine = await getRoutineById(id);
+    if (ogRoutine.creatorId != req.user.id) {
+      return next({
+        name: "InvalidUserCannotUpdate",
+        message: "You are not the owner of this routine",
+      });
+    }
+
+    const updatedRoutine = await updateRoutine({ id: id, ...req.body });
+    res.send(updatedRoutine);
   } catch (error) {
     next({
-      name: "FailedToPostRoutine",
-      message: "This routine could not be posted",
+      name: "FailedToUpdateRoutine",
+      message: "This routine does not exist",
     });
   }
 });
