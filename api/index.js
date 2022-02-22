@@ -5,6 +5,7 @@ const express = require("express");
 const apiRouter = express.Router();
 const usersRouter = require("./users");
 const activitiesRouter = require("./activities");
+const routineRouter = require("./routines");
 const routineActivitiesRouter = require("./routine_activities");
 const { getUserById } = require("../db");
 require("dotenv").config();
@@ -62,6 +63,7 @@ apiRouter.get("/health", (req, res, next) => {
 
 apiRouter.use("/users", usersRouter);
 apiRouter.use("/activities", activitiesRouter);
+apiRouter.use("/routines", routineRouter);
 apiRouter.use("/routine_activities", routineActivitiesRouter);
 
 module.exports = apiRouter;
