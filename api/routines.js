@@ -41,13 +41,10 @@ routineRouter.post("/", requireUser, async (req, res, next) => {
         message: "Please include both a name and a goal for your routine",
       });
     }
-    const routineFields = {
+    const newRoutine = await createRoutine({
       creatorId: req.user.id,
-      isPublic: req.body.isPublic,
-      name: req.body.name,
-      goal: req.body.goal,
-    };
-    const newRoutine = await createRoutine(routineFields);
+      ...req.body,
+    });
     res.send(newRoutine);
   } catch ({ name, message }) {
     next({ name, message });
@@ -65,7 +62,6 @@ routineRouter.patch("/:routineId", requireUser, async (req, res, next) => {
         message: "You are not the owner of this routine",
       });
     }
-
     const updatedRoutine = await updateRoutine({ id: id, ...req.body });
     res.send(updatedRoutine);
   } catch (error) {
@@ -75,5 +71,9 @@ routineRouter.patch("/:routineId", requireUser, async (req, res, next) => {
     });
   }
 });
+
+//DELETE /routines/:routineId (**)
+
+//POST /routines/:routineId/activities
 
 module.exports = routineRouter;
