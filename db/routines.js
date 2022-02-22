@@ -107,6 +107,37 @@ async function getAllRoutinesByUser({ username }) {
       `
         SELECT routines.*, users.username AS "creatorName" FROM routines
         JOIN users ON users.id = routines."creatorId"
+        WHERE users.username = $1;
+      `,
+      [username]
+    );
+
+    const { rows: activities } = await client.query(`
+      SELECT * FROM activities
+      JOIN routine_activities ON activities.id = routine_activities."activityId";
+    `);
+
+    routines.forEach((routine) => {
+      routine.activities = activities.filter(
+        (activity) => routine.id === activity.routineId
+      );
+    });
+
+    return routines;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// getPublicRoutinesByUser
+// getPublicRoutinesByUser({ username })
+// select and return an array of public routines made by user, include their activities
+async function getPublicRoutinesByUser({ username }) {
+  try {
+    const { rows: routines } = await client.query(
+      `
+        SELECT routines.*, users.username AS "creatorName" FROM routines
+        JOIN users ON users.id = routines."creatorId"
         WHERE "isPublic" = true AND users.username = $1;
       `,
       [username]
@@ -129,21 +160,46 @@ async function getAllRoutinesByUser({ username }) {
   }
 }
 
-//TODO NUMS ROUTINE FUNCIONS BELOW
-// getPublicRoutinesByUser
-// getPublicRoutinesByUser({ username })
-// select and return an array of public routines made by user, include their activities
-
 // getPublicRoutinesByActivity
 // getPublicRoutinesByActivity({ id })
 // select and return an array of public routines which have a specific activityId in their routine_activities join, include their activities
+async function getPublicRoutinesByActivity({ id }) {
+  try {
+    const { rows: routines } = await client.query(
+      `
+      SELECT routines.*, users.username AS "creatorName" FROM routines 
+      JOIN users ON users.id = "creatorId"
+      JOIN routine_activities ON routine_activities."routineId" = routines.id
+      WHERE "isPublic" = true AND "activityId" = $1;
+    `,
+      [id]
+    );
+
+    const { rows: activities } = await client.query(`
+    SELECT * FROM activities
+    JOIN routine_activities ON activities.id = routine_activities."activityId";
+  `);
+
+    routines.forEach((routine) => {
+      routine.activities = activities.filter(
+        (activity) => routine.id === activity.routineId
+      );
+    });
+
+    return routines;
+  } catch (error) {
+    throw error;
+  }
+}
 
 // createRoutine
 // createRoutine({ creatorId, isPublic, name, goal })
 // create and return the new routine
 async function createRoutine({ creatorId, isPublic, name, goal }) {
   try {
-    const { rows: routine } = await client.query(
+    const {
+      rows: [routine],
+    } = await client.query(
       `
      INSERT INTO routines("creatorId", "isPublic", name, goal)
      VALUES($1,$2,$3,$4)
@@ -227,7 +283,9 @@ module.exports = {
   getRoutinesWithoutActivities,
   getAllRoutines,
   getAllPublicRoutines,
+  getPublicRoutinesByUser,
   getAllRoutinesByUser,
+  getPublicRoutinesByActivity,
   createRoutine,
   updateRoutine,
   destroyRoutine,
