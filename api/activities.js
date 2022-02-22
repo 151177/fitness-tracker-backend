@@ -6,7 +6,7 @@ const {
   createActivity,
   updateActivity,
   getPublicRoutinesByActivity,
-} = require("../db/index");
+} = require("../db");
 const { requireUser } = require("./utils");
 
 activitiesRouter.use((req, res, next) => {
