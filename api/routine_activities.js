@@ -13,7 +13,7 @@ routineActivitiesRouter.use((req, res, next) => {
 
 // PATCH /routine_activities/:routineActivityId (**)
 // Update the count or duration on the routine activity
-//! Uncomment once done with making POST /routines/:routineId/activities route
+//! IN PROGRESS
 // routineActivitiesRouter.patch(
 //   "/:routineActivityId",
 //   requireUser,
@@ -44,7 +44,7 @@ routineActivitiesRouter.use((req, res, next) => {
 
 // DELETE /routine_activities/:routineActivityId (**)
 // Remove an activity from a routine, use hard delete
-//! Uncomment later
+//! IN PROGRESS
 // routineActivitiesRouter.delete(
 //   "/:routineActivityId",
 //   requireUser,
