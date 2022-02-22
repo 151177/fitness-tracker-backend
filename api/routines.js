@@ -73,6 +73,13 @@ routineRouter.patch("/:routineId", requireUser, async (req, res, next) => {
 });
 
 //DELETE /routines/:routineId (**)
+// routineRouter.delete('/:routineId', requireUser, (req,res,next)=>{
+//   try{
+
+//   } catch(error){
+//     next(error)
+//   }
+// })
 
 //POST /routines/:routineId/activities
 
