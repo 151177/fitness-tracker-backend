@@ -5,7 +5,8 @@ const {
   getAllActivities,
   createActivity,
   updateActivity,
-} = require("../db/index");
+  getPublicRoutinesByActivity,
+} = require("../db");
 const { requireUser } = require("./utils");
 
 activitiesRouter.use((req, res, next) => {
@@ -70,6 +71,22 @@ activitiesRouter.patch("/:activityId", requireUser, async (req, res, next) => {
   }
 });
 
-//todo GET /activities/:activityId/routines
+//GET /activities/:activityId/routines
+activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
+  try {
+    const id = req.params.activityId;
+    const routines = await getPublicRoutinesByActivity({ id });
+
+    if (routines.length === 0) {
+      return next({
+        name: "NoRoutinesWithActivity",
+        message: "There are no public routines with this activity",
+      });
+    }
+    res.send(routines);
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = activitiesRouter;
