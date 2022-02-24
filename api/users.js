@@ -4,6 +4,7 @@ const { requireUser } = require("./utils.js");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const { JWT_SECRET } = process.env;
+const { getPublicRoutinesByUser } = require("../db");
 
 usersRouter.use((req, res, next) => {
   console.log("A request is being made to /users");
@@ -100,5 +101,21 @@ usersRouter.get("/me", requireUser, (req, res, next) => {
 
 // GET /users/:username/routines
 // Get a list of public routines for a particular user.
+usersRouter.get("/:username/routines", async (req, res, next) => {
+  try {
+    const user = req.params.username;
+    const routines = await getPublicRoutinesByUser({ username: user });
+
+    if (routines.length === 0) {
+      return next({
+        name: "NoPublicRoutinesByUser",
+        message: "There are no public routines by this user",
+      });
+    }
+    res.send(routines);
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = usersRouter;
