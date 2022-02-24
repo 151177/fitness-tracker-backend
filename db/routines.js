@@ -1,4 +1,30 @@
 const client = require("./client");
+
+const addActivitiesToRoutines = async (routines) => {
+  try {
+    const routineIdArray = routines.map((routine) => {
+      return routine.id;
+    });
+
+    const { rows: activities } = await client.query(`
+      SELECT activities.*, routine_activities.duration, routine_activities.count, routine_activities."routineId", routine_activities.id AS "routineActivityId"
+      FROM activities
+      JOIN routine_activities ON activities.id = routine_activities."activityId"
+      WHERE routine_activities."routineId" IN (${routineIdArray});
+    `);
+
+    routines.forEach((routine) => {
+      routine.activities = activities.filter(
+        (activity) => routine.id === activity.routineId
+      );
+    });
+
+    return routines;
+  } catch (error) {
+    next(error);
+  }
+};
+
 // getRoutineById
 // getRoutineById(id)
 // return the routine
@@ -47,23 +73,11 @@ async function getAllRoutines() {
     const { rows: routines } = await client.query(
       `
         SELECT routines.*, users.username AS "creatorName" FROM routines
-        JOIN users
-        ON users.id = routines."creatorId";
+        JOIN users ON users.id = routines."creatorId";
       `
     );
 
-    const { rows: activities } = await client.query(`
-      SELECT activities.*, routine_activities.duration, routine_activities.count, routine_activities."routineId" FROM activities
-      JOIN routine_activities
-      ON activities.id = routine_activities."activityId";
-    `);
-
-    routines.forEach((routine) => {
-      routine.activities = activities.filter(
-        (activity) => routine.id === activity.routineId
-      );
-    });
-    return routines;
+    return await addActivitiesToRoutines(routines);
   } catch (error) {
     throw error;
   }
@@ -81,18 +95,7 @@ async function getAllPublicRoutines() {
       `
     );
 
-    const { rows: activities } = await client.query(`
-      SELECT * FROM activities
-      JOIN routine_activities ON activities.id = routine_activities."activityId";
-    `);
-
-    routines.forEach((routine) => {
-      routine.activities = activities.filter(
-        (activity) => routine.id === activity.routineId
-      );
-    });
-
-    return routines;
+    return await addActivitiesToRoutines(routines);
   } catch (error) {
     throw error;
   }
@@ -112,18 +115,7 @@ async function getAllRoutinesByUser({ username }) {
       [username]
     );
 
-    const { rows: activities } = await client.query(`
-      SELECT * FROM activities
-      JOIN routine_activities ON activities.id = routine_activities."activityId";
-    `);
-
-    routines.forEach((routine) => {
-      routine.activities = activities.filter(
-        (activity) => routine.id === activity.routineId
-      );
-    });
-
-    return routines;
+    return await addActivitiesToRoutines(routines);
   } catch (error) {
     throw error;
   }
@@ -143,18 +135,7 @@ async function getPublicRoutinesByUser({ username }) {
       [username]
     );
 
-    const { rows: activities } = await client.query(`
-      SELECT * FROM activities
-      JOIN routine_activities ON activities.id = routine_activities."activityId";
-    `);
-
-    routines.forEach((routine) => {
-      routine.activities = activities.filter(
-        (activity) => routine.id === activity.routineId
-      );
-    });
-
-    return routines;
+    return await addActivitiesToRoutines(routines);
   } catch (error) {
     throw error;
   }
@@ -170,23 +151,12 @@ async function getPublicRoutinesByActivity({ id }) {
       SELECT routines.*, users.username AS "creatorName" FROM routines 
       JOIN users ON users.id = "creatorId"
       JOIN routine_activities ON routine_activities."routineId" = routines.id
-      WHERE "isPublic" = true AND "activityId" = $1;
+      WHERE "isPublic" = true AND routine_activities."activityId" = $1;
     `,
       [id]
     );
 
-    const { rows: activities } = await client.query(`
-    SELECT * FROM activities
-    JOIN routine_activities ON activities.id = routine_activities."activityId";
-  `);
-
-    routines.forEach((routine) => {
-      routine.activities = activities.filter(
-        (activity) => routine.id === activity.routineId
-      );
-    });
-
-    return routines;
+    return await addActivitiesToRoutines(routines);
   } catch (error) {
     throw error;
   }
