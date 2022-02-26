@@ -1,3 +1,4 @@
+const res = require("express/lib/response");
 const client = require("./client");
 
 const addActivitiesToRoutines = async (routines) => {
@@ -40,12 +41,12 @@ async function getRoutineById(routineId) {
       [routineId]
     );
 
-    if (!routine) {
-      throw {
-        name: "RoutineNotFoundError",
-        message: "Could not find a routine with that routineId",
-      };
-    }
+    // if (!routine) {
+    //   throw {
+    //     name: "RoutineNotFoundError",
+    //     message: "Could not find a routine with that routineId",
+    //   };
+    // }
 
     return routine;
   } catch (error) {
@@ -236,13 +237,18 @@ async function destroyRoutine(id) {
       [id]
     );
 
-    await client.query(
+    const {
+      rows: [destroyedRoutine],
+    } = await client.query(
       `
     DELETE FROM routines
-    WHERE id = $1;
+    WHERE id = $1
+    RETURNING *;
     `,
       [id]
     );
+
+    return destroyedRoutine;
   } catch (error) {
     throw error;
   }

@@ -72,14 +72,24 @@ routineRouter.patch("/:routineId", requireUser, async (req, res, next) => {
   }
 });
 
-//DELETE /routines/:routineId (**)
-// routineRouter.delete('/:routineId', requireUser, (req,res,next)=>{
-//   try{
-
-//   } catch(error){
-//     next(error)
-//   }
-// })
+// DELETE /routines/:routineId (**)
+routineRouter.delete("/:routineId", requireUser, async (req, res, next) => {
+  try {
+    const id = req.params.routineId * 1;
+    const ogRoutine = await getRoutineById(id);
+    console.log(ogRoutine);
+    if (ogRoutine.creatorId == req.user.id) {
+      const routineToDestroy = await destroyRoutine(id);
+      console.log(routineToDestroy);
+      res.send(routineToDestroy);
+    }
+  } catch (error) {
+    next({
+      name: "InvalidUserCannotDelete",
+      message: "You are not the owner of this routine",
+    });
+  }
+});
 
 //POST /routines/:routineId/activities
 
