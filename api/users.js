@@ -4,20 +4,18 @@ const { requireUser } = require("./utils.js");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const { JWT_SECRET } = process.env;
-const { getPublicRoutinesByUser } = require("../db");
+const {
+  createUser,
+  getUser,
+  getUserByUsername,
+  getPublicRoutinesByUser,
+} = require("../db");
 
 usersRouter.use((req, res, next) => {
   console.log("A request is being made to /users");
 
   next();
 });
-
-const {
-  createUser,
-  getUser,
-  getUserById,
-  getUserByUsername,
-} = require("../db");
 
 // POST /users/register
 // Create a new user. Require username and password, and
