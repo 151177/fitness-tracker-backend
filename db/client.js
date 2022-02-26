@@ -7,7 +7,7 @@ const CONNECTION_STRING =
 const client = new Client({
   connectionString: CONNECTION_STRING,
   ssl:
-    process.env.NODE_ENG === "production"
+    process.env.NODE_ENV === "production"
       ? { rejectUnauthorized: false }
       : undefined,
 });
