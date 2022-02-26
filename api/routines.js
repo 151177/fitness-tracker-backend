@@ -103,7 +103,10 @@ routineRouter.post("/:routineId/activities", async (req, res, next) => {
 
     res.send(routine_activity);
   } catch (error) {
-    next(error);
+    next({
+      name: "FailedToAddActivityToRoutine",
+      message: "The activity could not be added to this routine",
+    });
   }
 });
 

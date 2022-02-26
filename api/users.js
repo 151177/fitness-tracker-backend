@@ -22,9 +22,8 @@ usersRouter.use((req, res, next) => {
 // hash password before saving user to DB.
 // Require all passwords to be at least 8 characters long.
 usersRouter.post("/register", async (req, res, next) => {
-  const { username, password } = req.body;
-
   try {
+    const { username, password } = req.body;
     const _user = await getUserByUsername(username);
     if (_user) {
       return next({
@@ -49,7 +48,10 @@ usersRouter.post("/register", async (req, res, next) => {
       user: newUser,
     });
   } catch ({ name, message }) {
-    next({ name, message });
+    next({
+      name: "InvalidUserNameorPassword",
+      message: "Please do not leave username or password fields blank",
+    });
   }
 });
 // Throw errors for duplicate username, or password-too-short.

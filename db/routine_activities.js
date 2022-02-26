@@ -104,6 +104,7 @@ async function destroyRoutineActivity(id) {
 
 // getRoutineActivitiesByRoutine
 // select and return an array of all routine_activity records
+//what is this function used for?
 async function getRoutineActivitiesByRoutine({ id }) {
   try {
     const { rows: routineActivity } = await client.query(
