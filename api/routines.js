@@ -12,6 +12,7 @@ const {
   createRoutine,
   updateRoutine,
   destroyRoutine,
+  addActivityToRoutine,
 } = require("../db");
 
 routineRouter.use((req, res, next) => {
@@ -77,10 +78,8 @@ routineRouter.delete("/:routineId", requireUser, async (req, res, next) => {
   try {
     const id = req.params.routineId * 1;
     const ogRoutine = await getRoutineById(id);
-    console.log(ogRoutine);
     if (ogRoutine.creatorId == req.user.id) {
       const routineToDestroy = await destroyRoutine(id);
-      console.log(routineToDestroy);
       res.send(routineToDestroy);
     }
   } catch (error) {
@@ -92,5 +91,22 @@ routineRouter.delete("/:routineId", requireUser, async (req, res, next) => {
 });
 
 //POST /routines/:routineId/activities
+routineRouter.post("/:routineId/activities", async (req, res, next) => {
+  const { activityId, count, duration } = req.body;
+  const { routineId } = req.params;
+
+  try {
+    const routine_activity = await addActivityToRoutine({
+      routineId,
+      activityId,
+      count,
+      duration,
+    });
+
+    res.send(routine_activity);
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = routineRouter;
