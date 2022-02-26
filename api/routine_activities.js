@@ -83,8 +83,8 @@ routineActivitiesRouter.delete(
       );
 
       res.send(deletedRoutineActivity);
-    } catch (error) {
-      next(error);
+    } catch ({ name, message }) {
+      next({ name, message });
     }
   }
 );
