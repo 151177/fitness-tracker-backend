@@ -3,12 +3,7 @@ const routineRouter = express.Router();
 const { requireUser } = require("./utils");
 const {
   getRoutineById,
-  getRoutinesWithoutActivities,
-  getAllRoutines,
   getAllPublicRoutines,
-  getPublicRoutinesByUser,
-  getAllRoutinesByUser,
-  getPublicRoutinesByActivity,
   createRoutine,
   updateRoutine,
   destroyRoutine,

@@ -5,12 +5,29 @@ const {
   getRoutineActivityById,
   updateRoutineActivity,
   getRoutineById,
+  destroyRoutineActivity,
 } = require("../db/index");
+const res = require("express/lib/response");
 
 routineActivitiesRouter.use((req, res, next) => {
   console.log("A request is made to /routine_activities");
   next();
 });
+
+const checkOwner = async (userId, routineId) => {
+  try {
+    const routine = await getRoutineById(routineId);
+    if (routine.creatorId != userId) {
+      return next({
+        name: "InvalidUser",
+        message: "You are not the owner of this routine",
+      });
+    }
+    return;
+  } catch ({ name, message }) {
+    next({ name, message });
+  }
+};
 
 // PATCH /routine_activities/:routineActivityId (**)
 // Update the count or duration on the routine activity
@@ -19,17 +36,15 @@ routineActivitiesRouter.patch(
   requireUser,
   async (req, res, next) => {
     try {
-      const id = req.params.routineActivityId;
-      const oldRoutineActivity = await getRoutineActivityById(id);
-      const routine = await getRoutineById(oldRoutineActivity.routineId);
-      if (routine.creatorId != req.user.id) {
-        return next({
-          name: "InvalidUser",
-          message: "You are not the owner of this routine",
-        });
-      }
+      const { routineActivityId } = req.params;
+      const userId = req.user.id;
+      const oldRoutineActivity = await getRoutineActivityById(
+        routineActivityId
+      );
+      await checkOwner(userId, oldRoutineActivity.routineId);
+
       const updates = {
-        id: id,
+        id: routineActivityId,
         count: oldRoutineActivity.count,
         duration: oldRoutineActivity.duration,
       };
@@ -52,17 +67,26 @@ routineActivitiesRouter.patch(
 
 // DELETE /routine_activities/:routineActivityId (**)
 // Remove an activity from a routine, use hard delete
-//! IN PROGRESS
-// routineActivitiesRouter.delete(
-//   "/:routineActivityId",
-//   requireUser,
-//   async (req, res, next) => {
-//     try {
-//       res.send("Delete in Progress");
-//     } catch (error) {
-//       next(error);
-//     }
-//   }
-// );
+routineActivitiesRouter.delete(
+  "/:routineActivityId",
+  requireUser,
+  async (req, res, next) => {
+    try {
+      const { routineActivityId } = req.params;
+      const userId = req.user.id;
+      const oldRoutineActivity = await getRoutineActivityById(
+        routineActivityId
+      );
+      await checkOwner(userId, oldRoutineActivity.routineId);
+      const deletedRoutineActivity = await destroyRoutineActivity(
+        routineActivityId
+      );
+
+      res.send(deletedRoutineActivity);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 module.exports = routineActivitiesRouter;
