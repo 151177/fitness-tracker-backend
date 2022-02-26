@@ -1,33 +1,16 @@
 const express = require("express");
 const routineActivitiesRouter = express.Router();
-const { requireUser } = require("./utils");
+const { requireUser, checkOwner } = require("./utils");
 const {
   getRoutineActivityById,
   updateRoutineActivity,
-  getRoutineById,
   destroyRoutineActivity,
-} = require("../db/index");
-const res = require("express/lib/response");
+} = require("../db");
 
 routineActivitiesRouter.use((req, res, next) => {
   console.log("A request is made to /routine_activities");
   next();
 });
-
-const checkOwner = async (userId, routineId) => {
-  try {
-    const routine = await getRoutineById(routineId);
-    if (routine.creatorId != userId) {
-      return next({
-        name: "InvalidUser",
-        message: "You are not the owner of this routine",
-      });
-    }
-    return;
-  } catch ({ name, message }) {
-    next({ name, message });
-  }
-};
 
 // PATCH /routine_activities/:routineActivityId (**)
 // Update the count or duration on the routine activity
@@ -37,20 +20,25 @@ routineActivitiesRouter.patch(
   async (req, res, next) => {
     try {
       const { routineActivityId } = req.params;
-      const userId = req.user.id;
       const oldRoutineActivity = await getRoutineActivityById(
         routineActivityId
       );
-      await checkOwner(userId, oldRoutineActivity.routineId);
-
+      const authorization = await checkOwner(
+        req.user.id,
+        oldRoutineActivity.routineId
+      );
+      if (!authorization) {
+        return next({
+          name: "InvalidUser",
+          message: "You are not the owner of this routine",
+        });
+      }
       const updates = {
         id: routineActivityId,
         count: oldRoutineActivity.count,
         duration: oldRoutineActivity.duration,
       };
-
       const { count, duration } = req.body;
-
       if (count) {
         updates.count = count;
       }
@@ -73,15 +61,22 @@ routineActivitiesRouter.delete(
   async (req, res, next) => {
     try {
       const { routineActivityId } = req.params;
-      const userId = req.user.id;
       const oldRoutineActivity = await getRoutineActivityById(
         routineActivityId
       );
-      await checkOwner(userId, oldRoutineActivity.routineId);
+      const authorization = await checkOwner(
+        req.user.id,
+        oldRoutineActivity.routineId
+      );
+      if (!authorization) {
+        return next({
+          name: "InvalidUser",
+          message: "You are not the owner of this routine",
+        });
+      }
       const deletedRoutineActivity = await destroyRoutineActivity(
         routineActivityId
       );
-
       res.send(deletedRoutineActivity);
     } catch ({ name, message }) {
       next({ name, message });

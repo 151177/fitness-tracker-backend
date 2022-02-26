@@ -4,7 +4,12 @@ const { requireUser } = require("./utils.js");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const { JWT_SECRET } = process.env;
-const { getPublicRoutinesByUser } = require("../db");
+const {
+  createUser,
+  getUser,
+  getUserByUsername,
+  getPublicRoutinesByUser,
+} = require("../db");
 
 usersRouter.use((req, res, next) => {
   console.log("A request is being made to /users");
@@ -12,21 +17,13 @@ usersRouter.use((req, res, next) => {
   next();
 });
 
-const {
-  createUser,
-  getUser,
-  getUserById,
-  getUserByUsername,
-} = require("../db");
-
 // POST /users/register
 // Create a new user. Require username and password, and
 // hash password before saving user to DB.
 // Require all passwords to be at least 8 characters long.
 usersRouter.post("/register", async (req, res, next) => {
-  const { username, password } = req.body;
-
   try {
+    const { username, password } = req.body;
     const _user = await getUserByUsername(username);
     if (_user) {
       return next({
@@ -51,7 +48,10 @@ usersRouter.post("/register", async (req, res, next) => {
       user: newUser,
     });
   } catch ({ name, message }) {
-    next({ name, message });
+    next({
+      name: "InvalidUserNameorPassword",
+      message: "Please do not leave username or password fields blank",
+    });
   }
 });
 // Throw errors for duplicate username, or password-too-short.

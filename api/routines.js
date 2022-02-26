@@ -1,8 +1,7 @@
 const express = require("express");
 const routineRouter = express.Router();
-const { requireUser } = require("./utils");
+const { requireUser, checkOwner } = require("./utils");
 const {
-  getRoutineById,
   getAllPublicRoutines,
   createRoutine,
   updateRoutine,
@@ -51,8 +50,8 @@ routineRouter.post("/", requireUser, async (req, res, next) => {
 routineRouter.patch("/:routineId", requireUser, async (req, res, next) => {
   try {
     const id = req.params.routineId;
-    const ogRoutine = await getRoutineById(id);
-    if (ogRoutine.creatorId != req.user.id) {
+    const authorization = await checkOwner(req.user.id, id);
+    if (!authorization) {
       return next({
         name: "InvalidUserCannotUpdate",
         message: "You are not the owner of this routine",
@@ -71,16 +70,20 @@ routineRouter.patch("/:routineId", requireUser, async (req, res, next) => {
 // DELETE /routines/:routineId (**)
 routineRouter.delete("/:routineId", requireUser, async (req, res, next) => {
   try {
-    const id = req.params.routineId * 1;
-    const ogRoutine = await getRoutineById(id);
-    if (ogRoutine.creatorId == req.user.id) {
-      const routineToDestroy = await destroyRoutine(id);
-      res.send(routineToDestroy);
+    const id = req.params.routineId;
+    const authorization = await checkOwner(req.user.id, id);
+    if (!authorization) {
+      return next({
+        name: "InvalidUserCannotUpdate",
+        message: "You are not the owner of this routine",
+      });
     }
+    const routineToDestroy = await destroyRoutine(id);
+    res.send(routineToDestroy);
   } catch (error) {
     next({
-      name: "InvalidUserCannotDelete",
-      message: "You are not the owner of this routine",
+      name: "FailedToDeleteRoutine",
+      message: "This routine does not exist",
     });
   }
 });
@@ -100,7 +103,10 @@ routineRouter.post("/:routineId/activities", async (req, res, next) => {
 
     res.send(routine_activity);
   } catch (error) {
-    next(error);
+    next({
+      name: "FailedToAddActivityToRoutine",
+      message: "The activity could not be added to this routine",
+    });
   }
 });
 
