@@ -4,6 +4,7 @@ const { requireUser } = require("./utils");
 const {
   getRoutineActivityById,
   updateRoutineActivity,
+  getRoutineById,
 } = require("../db/index");
 
 routineActivitiesRouter.use((req, res, next) => {
@@ -13,34 +14,41 @@ routineActivitiesRouter.use((req, res, next) => {
 
 // PATCH /routine_activities/:routineActivityId (**)
 // Update the count or duration on the routine activity
-//! IN PROGRESS
-// routineActivitiesRouter.patch(
-//   "/:routineActivityId",
-//   requireUser,
-//   async (req, res, next) => {
-//     try {
-//       const id = req.params.routineActivityId;
-//       const { count, duration } = req.body;
-//       const oldRoutineActivity = await getRoutineActivityById(id);
-//       const updates = {
-//         id: id,
-//         count: oldRoutineActivity.count,
-//         duration: oldRoutineActivity.duration,
-//       };
-//       if (!count) {
-//         updates.count = count;
-//       }
-//       if (!duration) {
-//         updates.duration = duration;
-//       }
-//       const updatedRoutineActivity = await updateRoutineActivity(updates);
-//       console.log("THESE ARE MY UPDATES", updatedRoutineActivity);
-//       res.send(updatedRoutineActivity);
-//     } catch ({ name, message }) {
-//       next({ name, message });
-//     }
-//   }
-// );
+routineActivitiesRouter.patch(
+  "/:routineActivityId",
+  requireUser,
+  async (req, res, next) => {
+    try {
+      const id = req.params.routineActivityId;
+      const oldRoutineActivity = await getRoutineActivityById(id);
+      const routine = await getRoutineById(oldRoutineActivity.routineId);
+      if (routine.creatorId != req.user.id) {
+        return next({
+          name: "InvalidUser",
+          message: "You are not the owner of this routine",
+        });
+      }
+      const updates = {
+        id: id,
+        count: oldRoutineActivity.count,
+        duration: oldRoutineActivity.duration,
+      };
+
+      const { count, duration } = req.body;
+
+      if (count) {
+        updates.count = count;
+      }
+      if (duration) {
+        updates.duration = duration;
+      }
+      const updatedRoutineActivity = await updateRoutineActivity(updates);
+      res.send(updatedRoutineActivity);
+    } catch ({ name, message }) {
+      next({ name, message });
+    }
+  }
+);
 
 // DELETE /routine_activities/:routineActivityId (**)
 // Remove an activity from a routine, use hard delete
