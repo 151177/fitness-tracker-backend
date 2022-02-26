@@ -6,7 +6,7 @@ async function getRoutineActivityById(id) {
   try {
     const {
       rows: [routineActivity],
-    } = client.query(
+    } = await client.query(
       `
       SELECT * FROM routine_activities 
       WHERE id = $1
