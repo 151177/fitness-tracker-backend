@@ -44,9 +44,15 @@ usersRouter.post("/register", async (req, res, next) => {
       password,
     });
 
-    res.send({
-      user: newUser,
-    });
+    if (newUser) {
+      // create token & return to user
+      const token = jwt.sign(newUser, JWT_SECRET);
+      res.send({
+        user: newUser,
+        message: `Thank You For Signing Up ${newUser.username}! `,
+        token: token,
+      });
+    }
   } catch ({ name, message }) {
     next({
       name: "InvalidUserNameorPassword",
