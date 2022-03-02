@@ -86,15 +86,12 @@ usersRouter.post("/login", async (req, res, next) => {
         message: `Welcome back ${user.username}! `,
         token: token,
       });
-    } else {
-      return next({
-        name: "IncorrectCredentialsError",
-        message: "Username or password is incorrect",
-      });
     }
   } catch (error) {
-    console.log(error);
-    next(error);
+    next({
+      name: "IncorrectCredentialsError",
+      message: "Username or password is incorrect",
+    });
   }
 });
 // Keep the id and username in the token.
