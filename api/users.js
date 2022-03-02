@@ -86,11 +86,16 @@ usersRouter.post("/login", async (req, res, next) => {
         message: `Welcome back ${user.username}! `,
         token: token,
       });
+    } else {
+      return next({
+        name: "IncorrectCredentialsError",
+        message: "Username or password is incorrect",
+      });
     }
   } catch (error) {
     next({
       name: "IncorrectCredentialsError",
-      message: "Username or password is incorrect",
+      message: "User does not exist, Please click the link below to register!",
     });
   }
 });
