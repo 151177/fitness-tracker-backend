@@ -7,6 +7,7 @@ const {
   updateRoutine,
   destroyRoutine,
   addActivityToRoutine,
+  getAllRoutinesByUser,
 } = require("../db");
 
 routineRouter.use((req, res, next) => {
@@ -31,7 +32,7 @@ routineRouter.get("/", async (req, res, next) => {
 routineRouter.get("/:username", requireUser, async (req, res, next) => {
   try {
     const username = req.params.username;
-    const userRoutines = await getAllRoutinesByUser({ username: username });
+    const userRoutines = await getAllRoutinesByUser({ username });
     res.send(userRoutines);
   } catch (error) {
     next({
