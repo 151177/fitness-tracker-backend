@@ -30,8 +30,8 @@ routineRouter.get("/", async (req, res, next) => {
 // GET /routines/:username (*)
 routineRouter.get("/:username", requireUser, async (req, res, next) => {
   try {
-    // const username = req.params.username;
-    const userRoutines = await getAllRoutinesByUser(req.params);
+    const username = req.params.username;
+    const userRoutines = await getAllRoutinesByUser({ username: username });
     res.send(userRoutines);
   } catch (error) {
     next({
