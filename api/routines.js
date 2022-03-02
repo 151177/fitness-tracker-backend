@@ -27,6 +27,20 @@ routineRouter.get("/", async (req, res, next) => {
   }
 });
 
+// GET /routines/:username (*)
+routineRouter.get("/:username", requireUser, async (req, res, next) => {
+  try {
+    const username = req.params.username;
+    const userRoutines = await getAllRoutinesByUser({ username });
+    res.send(userRoutines);
+  } catch (error) {
+    next({
+      name: "NoUserRoutines",
+      message: "Unable to get user routines",
+    });
+  }
+});
+
 //POST /routines (*)
 routineRouter.post("/", requireUser, async (req, res, next) => {
   try {
