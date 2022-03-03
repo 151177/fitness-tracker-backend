@@ -45,13 +45,6 @@ activitiesRouter.post("/", requireUser, async (req, res, next) => {
         message: "This activity already exists",
       });
     }
-    // const newActivity = await createActivity(req.body);
-    // if (!newActivity) {
-    //   return next({
-    //     name: "InvalidActivity",
-    //     message: "This activity already exists",
-    //   });
-    // }
     const newActivity = await createActivity(req.body);
     res.send(newActivity);
   } catch ({ name, message }) {
@@ -69,15 +62,6 @@ activitiesRouter.patch("/:activityId", requireUser, async (req, res, next) => {
     //setting updated info
     const { name, description } = req.body;
 
-    const allActivities = await getAllActivities();
-    const filter = allActivities.filter((activity) => activity.name === name);
-
-    if (filter.length > 0) {
-      return next({
-        name: "InvalidActivity",
-        message: "This activity already exists",
-      });
-    }
     const updates = {
       id: id,
       name: oldActivity.name,
