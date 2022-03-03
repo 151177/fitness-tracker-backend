@@ -25,7 +25,6 @@ activitiesRouter.get("/", async (req, res, next) => {
 });
 
 // POST /activities (*)
-//todo figure out a better way to prevent two of the same activity being made
 activitiesRouter.post("/", requireUser, async (req, res, next) => {
   try {
     if (!req.body.name || !req.body.description) {
