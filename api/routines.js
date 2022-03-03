@@ -7,6 +7,7 @@ const {
   updateRoutine,
   destroyRoutine,
   addActivityToRoutine,
+  getAllRoutinesByUser,
 } = require("../db");
 
 routineRouter.use((req, res, next) => {
@@ -23,6 +24,20 @@ routineRouter.get("/", async (req, res, next) => {
     next({
       name: "NoPublicRoutines",
       message: "Unable to get all public routines",
+    });
+  }
+});
+
+// GET /routines/:username (*)
+routineRouter.get("/:username", requireUser, async (req, res, next) => {
+  try {
+    const username = req.params.username;
+    const userRoutines = await getAllRoutinesByUser({ username });
+    res.send(userRoutines);
+  } catch (error) {
+    next({
+      name: "NoUserRoutines",
+      message: "Unable to get user routines",
     });
   }
 });

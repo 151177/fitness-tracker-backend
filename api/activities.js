@@ -25,16 +25,34 @@ activitiesRouter.get("/", async (req, res, next) => {
 });
 
 // POST /activities (*)
-//todo figure out a better way to prevent two of the same activity being made
 activitiesRouter.post("/", requireUser, async (req, res, next) => {
   try {
-    const newActivity = await createActivity(req.body);
-    if (!newActivity) {
+    if (!req.body.name || !req.body.description) {
+      return next({
+        name: "MissingNameorDescription",
+        message: "Please enter both a name and description for this activity",
+      });
+    }
+
+    const allActivities = await getAllActivities();
+    const filter = allActivities.filter(
+      (activity) => activity.name === req.body.name
+    );
+
+    if (filter.length > 0) {
       return next({
         name: "InvalidActivity",
         message: "This activity already exists",
       });
     }
+    // const newActivity = await createActivity(req.body);
+    // if (!newActivity) {
+    //   return next({
+    //     name: "InvalidActivity",
+    //     message: "This activity already exists",
+    //   });
+    // }
+    const newActivity = await createActivity(req.body);
     res.send(newActivity);
   } catch ({ name, message }) {
     next({ name, message });
@@ -50,6 +68,16 @@ activitiesRouter.patch("/:activityId", requireUser, async (req, res, next) => {
 
     //setting updated info
     const { name, description } = req.body;
+
+    const allActivities = await getAllActivities();
+    const filter = allActivities.filter((activity) => activity.name === name);
+
+    if (filter.length > 0) {
+      return next({
+        name: "InvalidActivity",
+        message: "This activity already exists",
+      });
+    }
     const updates = {
       id: id,
       name: oldActivity.name,
@@ -67,7 +95,10 @@ activitiesRouter.patch("/:activityId", requireUser, async (req, res, next) => {
     const newActivity = await updateActivity(updates);
     res.send(newActivity);
   } catch ({ name, message }) {
-    next({ name, message });
+    next({
+      name: "UpdateFailed",
+      message: "Activity failed to update",
+    });
   }
 });
 

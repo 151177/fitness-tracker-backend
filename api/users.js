@@ -44,9 +44,15 @@ usersRouter.post("/register", async (req, res, next) => {
       password,
     });
 
-    res.send({
-      user: newUser,
-    });
+    if (newUser) {
+      // create token & return to user
+      const token = jwt.sign(newUser, JWT_SECRET);
+      res.send({
+        user: newUser,
+        message: `Thank You For Signing Up ${newUser.username}! `,
+        token: token,
+      });
+    }
   } catch ({ name, message }) {
     next({
       name: "InvalidUserNameorPassword",
@@ -81,14 +87,16 @@ usersRouter.post("/login", async (req, res, next) => {
         token: token,
       });
     } else {
-      next({
+      return next({
         name: "IncorrectCredentialsError",
         message: "Username or password is incorrect",
       });
     }
   } catch (error) {
-    console.log(error);
-    next(error);
+    next({
+      name: "IncorrectCredentialsError",
+      message: "User does not exist, Please click the link below to register!",
+    });
   }
 });
 // Keep the id and username in the token.
